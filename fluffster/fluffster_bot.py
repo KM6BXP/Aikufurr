@@ -415,14 +415,12 @@ async def sendimages(message, itype, iseveryone, loopamt):
                    'USER1 opens their arms for USER2 so they could get a lovable hug from USER1']}
     for _ in range(loopamt):
         try:
-            with open(home + "/secret") as f:
-                tk = json.load(f)["fluffsterwebtoken"]
             if 'self' in itype:
                 selfhug = 1
                 itype = itype[:-4]
             else:
                 selfhug = 0
-            r = requests.get("https://aikufurr.com/fluffster/api/image/" + itype, headers={'Token': tk})
+            r = requests.get("https://aikufurr.com/api/images/" + itype)
         except:
             return
 
