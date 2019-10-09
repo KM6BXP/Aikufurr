@@ -89,10 +89,10 @@ function saveJSON(file, data) {
 var getDefaultChannel = (guild, option = "") => {
 
     if (option !== "") {
-        var settings = readJSON(guild.id);
+        let settings = readJSON(guild.id);
         //get guild's chosen channel
         if (settings.welcome && option === "welcome") {
-            var welcomeChannel = guild.channels.find(channel => channel.id === settings.welcome);
+            let welcomeChannel = guild.channels.find(channel => channel.id === settings.welcome);
             if (welcomeChannel) {
                 return welcomeChannel;
             }
@@ -105,7 +105,7 @@ var getDefaultChannel = (guild, option = "") => {
     }
 
     // Check for a "general" channel, which is often default chat
-    var generalChannel = guild.channels.find(channel => channel.name === "general");
+    let generalChannel = guild.channels.find(channel => channel.name === "general");
     if (generalChannel) {
         return generalChannel;
     }
@@ -144,7 +144,7 @@ function shuffle(a) {
 }
 
 function play(connection, msg) {
-    var server = servers[msg.guild.id];
+    let server = servers[msg.guild.id];
 
     server.dispatcher = connection.playStream(YTDL(server.queue[0], {
         filter: "audioonly"
@@ -176,14 +176,14 @@ function play(connection, msg) {
 
 function getPlaylist(url, msg) {
     let tmp = [];
-    request.get(url, function(err, res, body) {
+    request.get(url, (err, res, body) => {
         if (err) {
             console.error(err);
             throw err;
         } else {
-            var videoList = [];
+            let videoList = [];
 
-            var handler = new htmlparser.DefaultHandler(function(err, dom) {
+            let handler = new htmlparser.DefaultHandler(function(err, dom) {
                 if (err) {
                     console.error(err);
                     throw err;
@@ -201,9 +201,9 @@ function getPlaylist(url, msg) {
                 }
             });
 
-            var parser = new htmlparser.Parser(handler);
+            let parser = new htmlparser.Parser(handler);
             parser.parseComplete(body);
-            var server = servers[msg.guild.id];
+            let server = servers[msg.guild.id];
 
             videoList.forEach(function(item, index) {
                 server.queue.push(item.url.split("&")[0]);
@@ -219,7 +219,7 @@ function getPlaylist(url, msg) {
 
 client.on("guildCreate", guild => {
     console.log("Joined a new guild: " + guild.name);
-    var channel = getDefaultChannel(guild);
+    let channel = getDefaultChannel(guild);
     var em = new Discord.RichEmbed().setColor(`ORANGE`)
         .setFooter("Version " + global.version)
         .setTitle("Introduction")
@@ -248,9 +248,9 @@ client.on("guildDelete", guild => {
 
 
 client.on("guildMemberAdd", member => {
-    var settings = readJSON(member.guild.id);
+    let settings = readJSON(member.guild.id);
     if (settings.welcome) {
-        var channel = getDefaultChannel(member.guild, "welcome");
+        let channel = getDefaultChannel(member.guild, "welcome");
         if (settings.welcomemsg) {
             channel.send(settings.welcomemsg.replace("{user}", member).replace("{guild}", guild.name));
         } else {
@@ -270,14 +270,14 @@ async function checkTimes() {
                     return console.log(`Unable to scan directory: ` + err);
                 }
                 files.forEach(function(file) {
-                    var fjson = JSON.parse(fs.readFileSync(`./FoxoBotData/${file}`, `utf8`));
+                    let fjson = JSON.parse(fs.readFileSync(`./FoxoBotData/${file}`, `utf8`));
                     Object.keys(fjson.remindme).forEach(function(user) {
-                        for (var i = 0; i < fjson.remindme[user].length; i++) {
-                            var needed = new Date(fjson.remindme[user][i][0]);
-                            var now = new Date();
+                        for (let i = 0; i < fjson.remindme[user].length; i++) {
+                            let needed = new Date(fjson.remindme[user][i][0]);
+                            let now = new Date();
                             if (needed < now) {
                                 client.users.get(user).send(`<@${user}>, Here is your reminder: \`\`\`\n${fjson.remindme[user][i][1]}\n\`\`\``);
-                                var index = fjson.remindme[user].indexOf(fjson.remindme[user][i]);
+                                let index = fjson.remindme[user].indexOf(fjson.remindme[user][i]);
                                 if (index > -1) {
                                     fjson.remindme[user].splice(index, 1);
                                 }
@@ -298,10 +298,10 @@ async function checkTimes() {
                     return console.log(`Unable to scan directory: ` + err);
                 }
                 files.forEach(function(file) {
-                    var fjson = JSON.parse(fs.readFileSync(`./FoxoBotData/${file}`, `utf8`));
-                    for (var i = 0; i < fjson.moderation.mute.length; i++) {
-                        var needed = new Date(fjson.moderation.mute[i][2]);
-                        var now = new Date();
+                    let fjson = JSON.parse(fs.readFileSync(`./FoxoBotData/${file}`, `utf8`));
+                    for (let i = 0; i < fjson.moderation.mute.length; i++) {
+                        let needed = new Date(fjson.moderation.mute[i][2]);
+                        let now = new Date();
                         if (needed < now) {
                             fjson.moderation.mute.splice(i, 1);
                             fs.writeFileSync(`./FoxoBotData/${file}`, JSON.stringify(fjson));
@@ -368,7 +368,7 @@ client.on("message", msg => {
 
         saveJSON(msg.guild.id, settings);
 
-        for (var i = 0; i < settings.moderation.mute.length; i++) {
+        for (let i = 0; i < settings.moderation.mute.length; i++) {
             if (msg.author.id === settings.moderation.mute[i][0]) {
                 msg.delete();
                 return;
@@ -377,19 +377,21 @@ client.on("message", msg => {
 
         if (!msg.content.startsWith(settings.prefix)) return;
 
-        var args = msg.content.substring(settings.prefix.length).split(" ")
+        let args = msg.content.substring(settings.prefix.length).split(" ")
 
         if (settings.toggled.includes(args[0])) {
             return;
         }
+
+        let perms = msg.member.permissions;
+        let isAdmin = perms.has("ADMINISTRATOR");
+        let server = servers[msg.guild.id];
 
         switch (args[0].toLowerCase()) {
             case "ping":
                 msg.reply(`Pong!`);
                 break;
             case "kick":
-                var perms = msg.member.permissions;
-                var isAdmin = perms.has("ADMINISTRATOR");
                 if (!isAdmin) {
                     msg.reply("You are not an admin.")
                     break;
@@ -401,8 +403,8 @@ client.on("message", msg => {
                 }
 
                 if (args[2]) {
-                    var item = "";
-                    for (var i = 2; i < args.length; i++) {
+                    let item = "";
+                    for (let i = 2; i < args.length; i++) {
                         item += args[i] + " ";
                     }
 
@@ -425,8 +427,6 @@ client.on("message", msg => {
                 })
                 break;
             case "ban":
-                var perms = msg.member.permissions;
-                var isAdmin = perms.has("ADMINISTRATOR");
                 if (!isAdmin) {
                     msg.reply("You are not an admin.")
                     break;
@@ -437,8 +437,8 @@ client.on("message", msg => {
                 }
 
                 if (args[2]) {
-                    var item = "";
-                    for (var i = 2; i < args.length; i++) {
+                    let item = "";
+                    for (let i = 2; i < args.length; i++) {
                         item += args[i] + " ";
                     }
 
@@ -462,19 +462,17 @@ client.on("message", msg => {
                 break;
             case "sanction":
             case "sanctions":
-                var perms = msg.member.permissions;
-                var isAdmin = perms.has("ADMINISTRATOR");
                 if (!isAdmin) {
                     msg.reply("You are not an admin.")
                     break;
                 }
 
-                var warns = "";
-                var mutes = "";
+                let warns = "";
+                let mutes = "";
 
                 if (!args[1]) {
                     Object.keys(settings.moderation["sanctions"]).forEach(function(user) {
-                        for (var i = 0; i < settings.moderation["sanctions"][user].length; i++) {
+                        for (let i = 0; i < settings.moderation["sanctions"][user].length; i++) {
                             if (settings.moderation["sanctions"][user][i][0] === "warn") {
                                 warns += `\n<@${user}>: \`${settings.moderation["sanctions"][user][i][1]}\` AT ${settings.moderation["sanctions"][user][i][2]}`
                             }
@@ -484,8 +482,8 @@ client.on("message", msg => {
                         }
                     })
                 } else {
-                    var user = getUserFromMention(args[1]).id;
-                    for (var i = 0; i < settings.moderation["sanctions"][user].length; i++) {
+                    let user = getUserFromMention(args[1]).id;
+                    for (let i = 0; i < settings.moderation["sanctions"][user].length; i++) {
                         if (settings.moderation["sanctions"][user][i][0] === "warn") {
                             warns += `\n<@${user}>: \`${settings.moderation["sanctions"][user][i][1]}\` AT ${settings.moderation["sanctions"][user][i][2]}`
                         }
@@ -504,8 +502,6 @@ client.on("message", msg => {
 
                 break;
             case "mute":
-                var perms = msg.member.permissions;
-                var isAdmin = perms.has("ADMINISTRATOR");
                 if (!isAdmin) {
                     msg.reply("You are not an admin.")
                     break;
@@ -520,7 +516,7 @@ client.on("message", msg => {
                         settings.moderation["sanctions"][getUserFromMention(args[1]).id] = []
                     }
 
-                    var now = new Date();
+                    let now = new Date();
 
                     function addDate(date, t, delim) {
                         var delim = (delim) ? delim : `:`,
@@ -528,15 +524,15 @@ client.on("message", msg => {
                             z = 0,
                             arr = t.split(delim);
 
-                        for (var i = 0; i < arr.length; i++) {
+                        for (let i = 0; i < arr.length; i++) {
                             z = parseInt(arr[i], 10);
                             if (z != NaN) {
-                                var y = /^\d+?y/i.test(arr[i]) ? 31556926 : 0; //years
-                                var w = /^\d+?w/i.test(arr[i]) ? 604800 : 0; //weeks
-                                var d = /^\d+?d/i.test(arr[i]) ? 86400 : 0; //days
-                                var h = /^\d+?h/i.test(arr[i]) ? 3600 : 0; //hours
-                                var m = /^\d+?m/i.test(arr[i]) ? 60 : 0; //minutes
-                                var s = /^\d+?s/i.test(arr[i]) ? 1 : 0; //seconds
+                                let y = /^\d+?y/i.test(arr[i]) ? 31556926 : 0; //years
+                                let w = /^\d+?w/i.test(arr[i]) ? 604800 : 0; //weeks
+                                let d = /^\d+?d/i.test(arr[i]) ? 86400 : 0; //days
+                                let h = /^\d+?h/i.test(arr[i]) ? 3600 : 0; //hours
+                                let m = /^\d+?m/i.test(arr[i]) ? 60 : 0; //minutes
+                                let s = /^\d+?s/i.test(arr[i]) ? 1 : 0; //seconds
                                 x += z * (y + w + d + h + m + s);
                             }
                         }
@@ -546,8 +542,8 @@ client.on("message", msg => {
                     if (/([0-9].*(y|w|d|h|m|s))/g.test(args[2])) {
                         addDate(now, args[2]);
                         if (args[3]) {
-                            var item = "";
-                            for (var i = 3; i < args.length; i++) {
+                            let item = "";
+                            for (let i = 3; i < args.length; i++) {
                                 item += args[i] + " ";
                             }
 
@@ -559,8 +555,8 @@ client.on("message", msg => {
                     } else {
                         addDate(now, "1h");
                         if (args[2]) {
-                            var item = "";
-                            for (var i = 2; i < args.length; i++) {
+                            let item = "";
+                            for (let i = 2; i < args.length; i++) {
                                 item += args[i] + " ";
                             }
 
@@ -582,8 +578,6 @@ client.on("message", msg => {
                 }
                 break;
             case "warn":
-                var perms = msg.member.permissions;
-                var isAdmin = perms.has("ADMINISTRATOR");
                 if (!isAdmin) {
                     msg.reply("You are not an admin.")
                     break;
@@ -595,8 +589,8 @@ client.on("message", msg => {
                         settings.moderation["sanctions"][getUserFromMention(args[1]).id] = []
                     }
                     if (args[2]) {
-                        var item = "";
-                        for (var i = 2; i < args.length; i++) {
+                        let item = "";
+                        for (let i = 2; i < args.length; i++) {
                             item += args[i] + " ";
                         }
 
@@ -605,7 +599,7 @@ client.on("message", msg => {
                     } else {
                         var reason = "None Given"
                     }
-                    var now = new Date();
+                    let now = new Date();
 
                     settings.moderation["sanctions"][getUserFromMention(args[1]).id].push(["warn", reason, now.toString()]);
                     saveJSON(msg.guild.id, settings);
@@ -623,10 +617,10 @@ client.on("message", msg => {
                 }
 
                 if (Object.keys(settings.lists[msg.author.id]).length > 0) {
-                    var lists = ""
-                    var loop = 0;
-                    var userLists = {}
-                    Object.keys(settings.lists[msg.author.id]).forEach(function(list) {
+                    let lists = ""
+                    let loop = 0;
+                    let userLists = {}
+                    Object.keys(settings.lists[msg.author.id]).forEach((list) => {
                         lists += `\n${loop}: ${list}`
                         userLists[loop] = list
                         loop += 1
@@ -664,12 +658,12 @@ client.on("message", msg => {
                             })
                             return;
                         }
-                        var selectedList = settings.lists[msg.author.id][userLists[msgList.content]];
+                        let selectedList = settings.lists[msg.author.id][userLists[msgList.content]];
                         if (Object.keys(selectedList).length === 0) {
                             var lists = "None";
                         } else {
                             var lists = ""
-                            for (var i = 0; i < selectedList.length; i++) {
+                            for (let i = 0; i < selectedList.length; i++) {
                                 lists += `\n${i}: ${selectedList[i]}`
                             }
                         }
@@ -701,8 +695,8 @@ client.on("message", msg => {
                                         maxMatches: 1
                                     });
                                     collector.on('collect', msgEdit => {
-                                        var old_key = userLists[msgList.content];
-                                        var new_key = msgEdit.content;
+                                        let old_key = userLists[msgList.content];
+                                        let new_key = msgEdit.content;
                                         if (old_key !== new_key) {
                                             Object.defineProperty(settings.lists[msg.author.id], new_key,
                                                 Object.getOwnPropertyDescriptor(settings.lists[msg.author.id], old_key));
@@ -744,7 +738,7 @@ client.on("message", msg => {
                                 }
                                 return;
                             }
-                            var selectedList = settings.lists[msg.author.id][userLists[msgList.content]][msgItem.content];
+                            let selectedList = settings.lists[msg.author.id][userLists[msgList.content]][msgItem.content];
 
                             var em = new Discord.RichEmbed().setColor(`ORANGE`)
                                 .setTitle(`${selectedList}`)
@@ -854,9 +848,9 @@ client.on("message", msg => {
                                 uri: "https://aikufurr.com/fluffster/api/endpoints",
                                 method: "GET",
                                 json: true
-                            }, function(error, response, body) {
-                                var imageout = "";
-                                for (var i = 0; i < body.length; i++) {
+                            }, (error, response, body) => {
+                                let imageout = "";
+                                for (let i = 0; i < body.length; i++) {
                                     imageout += `${settings.prefix}${body[i].split(/[\/]+/).pop()}\n`;
                                 }
                                 var em = new Discord.RichEmbed().setColor(`ORANGE`)
@@ -872,7 +866,7 @@ client.on("message", msg => {
                             msg.channel.send(em);
                             break;
                         case "music":
-                            var em = new Discord.RichEmbed().setColor(`ORANGE`)
+                            let collector = new Discord.RichEmbed().setColor(`ORANGE`)
                                 .setTitle("Music")
                                 .addField("play", `usage: \`${settings.prefix}play URL/PLAYLIST\`\nexample: \`${settings.prefix}play https://www.youtube.com/watch?v=1UF-uVi0GlU\`\nexample: \`${settings.prefix}play https://www.youtube.com/playlist?list=OLAK5uy_nPfI0OOarBfgx1bsnIn21KQ2NMi2Z76MQ\`\nPlayes media from youtube`)
                                 .addField("pause", `usage: \`${settings.prefix}pause\`\nPauses the currently playing song`)
@@ -901,8 +895,8 @@ client.on("message", msg => {
                 }
                 if (args)
                     if (args[1] === "welcome") {
-                        var perms = msg.member.permissions;
-                        var isAdmin = perms.has("ADMINISTRATOR");
+                        let perms = msg.member.permissions;
+                        let isAdmin = perms.has("ADMINISTRATOR");
                         if (!isAdmin) {
                             msg.reply("You are not an admin.")
                             break;
@@ -924,8 +918,8 @@ client.on("message", msg => {
                             break;
                         }
 
-                        var item = "";
-                        for (var i = 2; i < args.length; i++) {
+                        let item = "";
+                        for (let i = 2; i < args.length; i++) {
                             item += args[i] + " ";
                         }
 
@@ -938,8 +932,8 @@ client.on("message", msg => {
                     }
 
                 if (args[1] === "prefix") {
-                    var perms = msg.member.permissions;
-                    var isAdmin = perms.has("ADMINISTRATOR");
+                    let perms = msg.member.permissions;
+                    let isAdmin = perms.has("ADMINISTRATOR");
                     if (!isAdmin) {
                         msg.reply("You are not an admin.")
                         break;
@@ -958,8 +952,8 @@ client.on("message", msg => {
                     msg.channel.send("Pefix is now set to `" + args[2] + "`")
                     saveJSON(msg.guild.id, settings);
                 } else if (args[1] === "toggle") {
-                    var perms = msg.member.permissions;
-                    var isAdmin = perms.has("ADMINISTRATOR");
+                    let perms = msg.member.permissions;
+                    let isAdmin = perms.has("ADMINISTRATOR");
                     if (!isAdmin) {
                         msg.reply("You are not an admin.")
                         break;
@@ -974,7 +968,7 @@ client.on("message", msg => {
                         break;
                     }
                     if (settings.toggled.includes(args[2])) {
-                        var index = settings.toggled.indexOf(args[2]);
+                        let index = settings.toggled.indexOf(args[2]);
                         if (index > -1) {
                             settings.toggled.splice(index, 1);
                         }
@@ -1009,16 +1003,16 @@ client.on("message", msg => {
                     if (settings.remindme[msg.author.id].length == 0) {
                         msg.reply(`Looks like you don't have any RemindMes, type \`${settings.prefix}remindme 10m item\`, item being what you to be reminded about, examples: \nRemind 1 day later: \`${settings.prefix}remindme 1d Do this thing\`\nRemind 15 minutes later: \`${settings.prefix}remindme 15m Do this thing\`\nAccepted formats: \`ny:nw:nd:nh:nm:ns\` where \`n\` is a number`)
                     } else {
-                        var out = "";
-                        for (var i = 0; i < settings.remindme[msg.author.id].length; i++) {
+                        let out = "";
+                        for (let i = 0; i < settings.remindme[msg.author.id].length; i++) {
                             out += `${i+1}: ${settings.remindme[msg.author.id][i]}\n`
                         }
                         msg.reply(`Your RemindMes: \`\`\`\n${out}\`\`\``)
                     }
                 } else {
-                    var now = new Date();
-                    var item = "";
-                    for (var i = 2; i < args.length; i++) {
+                    let now = new Date();
+                    let item = "";
+                    for (let i = 2; i < args.length; i++) {
                         item += args[i] + " ";
                     }
 
@@ -1032,15 +1026,15 @@ client.on("message", msg => {
                             z = 0,
                             arr = t.split(delim);
 
-                        for (var i = 0; i < arr.length; i++) {
+                        for (let i = 0; i < arr.length; i++) {
                             z = parseInt(arr[i], 10);
                             if (z != NaN) {
-                                var y = /^\d+?y/i.test(arr[i]) ? 31556926 : 0; //years
-                                var w = /^\d+?w/i.test(arr[i]) ? 604800 : 0; //weeks
-                                var d = /^\d+?d/i.test(arr[i]) ? 86400 : 0; //days
-                                var h = /^\d+?h/i.test(arr[i]) ? 3600 : 0; //hours
-                                var m = /^\d+?m/i.test(arr[i]) ? 60 : 0; //minutes
-                                var s = /^\d+?s/i.test(arr[i]) ? 1 : 0; //seconds
+                                let y = /^\d+?y/i.test(arr[i]) ? 31556926 : 0; //years
+                                let w = /^\d+?w/i.test(arr[i]) ? 604800 : 0; //weeks
+                                let d = /^\d+?d/i.test(arr[i]) ? 86400 : 0; //days
+                                let h = /^\d+?h/i.test(arr[i]) ? 3600 : 0; //hours
+                                let m = /^\d+?m/i.test(arr[i]) ? 60 : 0; //minutes
+                                let s = /^\d+?s/i.test(arr[i]) ? 1 : 0; //seconds
                                 x += z * (y + w + d + h + m + s);
                             }
                         }
@@ -1067,12 +1061,11 @@ client.on("message", msg => {
                     queue: []
                 };
 
-                var server = servers[msg.guild.id];
+
                 server.notEnded = true;
 
                 if (args[1].includes("list=")) {
-                    var newList = [];
-                    var playlistURL = "https://www.youtube.com/playlist?list=" + args[1].split("list=")[1];
+                    let playlistURL = "https://www.youtube.com/playlist?list=" + args[1].split("list=")[1];
                     getPlaylist(playlistURL, msg);
                 } else {
                     server.queue.push(args[1]);
@@ -1087,15 +1080,15 @@ client.on("message", msg => {
                 }
                 break;
             case "queue":
-                var server = servers[msg.guild.id];
+
                 var em = new Discord.RichEmbed().setColor(`ORANGE`);
-                var out = "";
+                let out = "";
                 em.setTitle("Music Queue");
                 em.setDescription(server.queue);
                 msg.channel.send(em);
                 break;
             case "skip":
-                var server = servers[msg.guild.id];
+
 
                 if (!msg.member.voiceChannel) {
                     msg.channel.send("You must be in a voice channel to use this command")
@@ -1105,7 +1098,7 @@ client.on("message", msg => {
                 if (server.dispatcher) server.dispatcher.end();
                 break;
             case "stop":
-                var server = servers[msg.guild.id];
+
 
                 server.notEnded = false;
 
@@ -1124,7 +1117,7 @@ client.on("message", msg => {
                     break;
                 };
 
-                var server = servers[msg.guild.id];
+
 
                 if (!server.dispatcher) {
                     msg.channel.send("Nothing is playing")
@@ -1136,19 +1129,19 @@ client.on("message", msg => {
 
                 break;
             case "volume":
-                var server = servers[msg.guild.id];
+
 
                 if (!msg.member.voiceChannel) {
                     msg.channel.send("You must be in a voice channel to use this command")
                     break;
                 };
 
-                var volume = args[1] * 0.1;
+                let volume = args[1] * 0.1;
 
                 if (server.dispatcher) server.dispatcher.setVolume(volume);
                 break;
             case "loop":
-                var server = servers[msg.guild.id];
+
 
                 if (!msg.member.voiceChannel) {
                     msg.channel.send("You must be in a voice channel to use this command")
@@ -1165,7 +1158,7 @@ client.on("message", msg => {
 
                 break;
             case "pause":
-                var server = servers[msg.guild.id];
+
 
                 if (!msg.member.voiceChannel) {
                     msg.channel.send("You must be in a voice channel to use this command")
@@ -1180,7 +1173,7 @@ client.on("message", msg => {
 
                 break;
             case "resume":
-                var server = servers[msg.guild.id];
+
 
                 if (!msg.member.voiceChannel) {
                     msg.channel.send("You must be in a voice channel to use this command")
@@ -1222,18 +1215,18 @@ client.on("message", msg => {
 
                 if (settings.ranks.hasOwnProperty(user.id)) {
 
-                    var arr = Object.entries(settings.ranks).sort(([key2, val2]) => val2).reverse();
+                    let arr = Object.entries(settings.ranks).sort(([key1, val1], [key2, val2]) => val2 - val1)
 
-                    for (var i = 0; i < arr.length; i++) {
+                    for (let i = 0; i < arr.length; i++) {
                         if (arr[i][0] == user.id) {
                             var player_rank = i + 1;
                             break;
                         }
                     }
 
-                    var player_total_xp = settings.ranks[user.id];
+                    let player_total_xp = settings.ranks[user.id];
 
-                    var total_players = client.guilds.get(msg.guild.id).memberCount;
+                    let total_players = client.guilds.get(msg.guild.id).memberCount;
 
                     var em = new Discord.RichEmbed().setColor(`ORANGE`)
                         .setTitle(user.username + "'s Rank")
@@ -1244,7 +1237,7 @@ client.on("message", msg => {
                 break;
             case "avatar":
                 if (args[1]) {
-                    var user = getUserFromMention(args[1]);
+                    let user = getUserFromMention(args[1]);
                     if (!user) {
                         msg.reply(`Please use a proper mention if you want to see someone else\'s avatar.`);
                         break;
@@ -1278,12 +1271,12 @@ client.on("message", msg => {
                     } else {
                         var spam = 1;
                     }
-                    for (var i = 0; i < spam; i++) {
+                    for (let i = 0; i < spam; i++) {
                         request({
                             uri: "https://aikufurr.com/api/images/" + args[0],
                             method: "GET",
                             json: true
-                        }, function(error, response, body) {
+                        }, (error, response, body) => {
                             var em = new Discord.RichEmbed().setColor(`ORANGE`)
                                 .setImage(body)
                             msg.channel.send(em);
