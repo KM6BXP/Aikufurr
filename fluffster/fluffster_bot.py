@@ -434,7 +434,7 @@ async def sendimages(message, itype, iseveryone, loopamt):
             all_rows = [["error"]]
             PrintException()
 
-        emfoot = "Images from: https://aikufurr.com/fluffster | Usages: " + str(timesUsed)  # Sets the footer of the embeded
+        emfoot = "Images from: https://aikufurr.com/ | Usages: " + str(timesUsed)  # Sets the footer of the embeded
 
         try:
             if selfhug:
