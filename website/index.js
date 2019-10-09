@@ -30,6 +30,12 @@ function customResponse(response, code) {
 var router = express.Router();
 app.use('/api', router);
 
+
+// Backward Compatible API Fix
+app.get('/fluffster/api/images/:data/:image', (req, res) => {
+    res.sendFile(`${__dirname}/public/api/images/${req.params.data}/${req.params.image}`)
+})
+
 app.get("/", (req, res) => {
     render(res, 'html/index.html')
 })
@@ -108,10 +114,6 @@ router.get("/images/:data?/:image?", (req, res) => {
     } else {
         res.sendFile(`${__dirname}/public/api/images/${req.params.data}/${req.params.image}`)
     }
-})
-
-app.get('/fluffster/api/images/:data/:image', (req, res) => {
-    res.sendFile(`${__dirname}/public/api/images/${req.params.data}/${req.params.image}`)
 })
 
 app.listen(port, () => console.log(`app listening on port ${port}!`))
