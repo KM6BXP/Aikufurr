@@ -1,0 +1,20 @@
+{
+    "name": "foxobot",
+    "version": "1.0.0",
+    "description": "Discord Bot made in JS",
+    "main": "FoxoBot.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Aikufurr",
+    "license": "GNU GPLv3",
+    "dependencies": {
+        "discord.js": "^11.5.1",
+        "htmlparser": "^1.7.7",
+        "long": "^4.0.0",
+        "opusscript": "0.0.7",
+        "request": "^2.81.0",
+        "soupselect": "^0.2.0",
+        "ytdl-core": "^0.29.5"
+    }
+}
