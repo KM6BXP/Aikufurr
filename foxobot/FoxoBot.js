@@ -1280,12 +1280,9 @@ client.on("message", msg => {
                     }
                     for (var i = 0; i < spam; i++) {
                         request({
-                            uri: "https://aikufurr.com/fluffster/api/image/" + args[0],
+                            uri: "https://aikufurr.com/api/images/" + args[0],
                             method: "GET",
-                            json: true,
-                            headers: {
-                                Token: secret.fluffsterwebtoken
-                            }
+                            json: true
                         }, function(error, response, body) {
                             var em = new Discord.RichEmbed().setColor(`ORANGE`)
                                 .setImage(body)
