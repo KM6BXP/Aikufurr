@@ -1212,22 +1212,23 @@ client.on("message", msg => {
                 } else {
                     var user = msg.author
                 }
-
+                // if user is in the rank obj
                 if (settings.ranks.hasOwnProperty(user.id)) {
-
+                    // sort every user by their amount of messages
                     let arr = Object.entries(settings.ranks).sort(([key1, val1], [key2, val2]) => val2 - val1)
 
+                    // Gets the user's amount of messages
                     for (let i = 0; i < arr.length; i++) {
                         if (arr[i][0] == user.id) {
                             var player_rank = i + 1;
                             break;
                         }
                     }
-
+                    // Gets the user's amount of messages
                     let player_total_xp = settings.ranks[user.id];
-
+                    // Gets number of users in guild
                     let total_players = client.guilds.get(msg.guild.id).memberCount;
-
+                    // sends embed
                     var em = new Discord.RichEmbed().setColor(`ORANGE`)
                         .setTitle(user.username + "'s Rank")
                         .addField("Rank", player_rank + "/" + total_players, true)
