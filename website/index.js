@@ -110,4 +110,8 @@ router.get("/images/:data?/:image?", (req, res) => {
     }
 })
 
+app.get('/fluffster/api/images/:data/image', (req, res) => {
+    res.sendFile(`${__dirname}/public/api/images/${req.params.data}/${req.params.image}`)
+})
+
 app.listen(port, () => console.log(`app listening on port ${port}!`))
