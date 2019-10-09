@@ -3,7 +3,10 @@ const app = express();
 const port = 5001;
 const fs = require('fs');
 var bodyParser = require('body-parser');
-var Sqrl = require('squirrelly')
+var Sqrl = require('squirrelly');
+const secret = JSON.parse(fs.readFileSync(require("os").homedir() + "/secret", "utf8"));
+
+var procal = secret.env === "pro" ? "https" : "http";
 
 app.use('/js', express.static(__dirname + '/public/js'));
 app.use('/css', express.static(__dirname + '/public/css'));
@@ -75,7 +78,7 @@ router.post('*', function(req, res) {
 });
 
 router.get('/', function(req, res) {
-    res.json([`${req.protocol + '://' + req.get('host')}/api/images`]);
+    res.json([`${procal + '://' + req.get('host')}/api/images`]);
 });
 
 router.get("/images/:data?/:image?", (req, res) => {
@@ -87,7 +90,7 @@ router.get("/images/:data?/:image?", (req, res) => {
             }
             let dirs = [];
             files.forEach((dir) => {
-                dirs.push(`${req.protocol + '://' + req.get('host')}/api/images/${dir}`);
+                dirs.push(`${procal + '://' + req.get('host')}/api/images/${dir}`);
             })
             res.json(dirs);
         })
@@ -100,7 +103,7 @@ router.get("/images/:data?/:image?", (req, res) => {
 
             let file = files[Math.floor(Math.random() * files.length)];
 
-            res.json(`${req.protocol + '://' + req.get('host')}/api/images/${req.params.data}/${file}`);
+            res.json(`${procal + '://' + req.get('host')}/api/images/${req.params.data}/${file}`);
         })
     } else {
         res.sendFile(`${__dirname}/public/api/images/${req.params.data}/${req.params.image}`)
