@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Aikufurr/Website.git"
+        "url": "git+https://github.com/Aikufurr/Aikufurr.git"
     },
     "keywords": [
         "node",
@@ -23,9 +23,9 @@
     "author": "Aikufurr",
     "license": "GNU GPLv3",
     "bugs": {
-        "url": "https://github.com/Aikufurr/Website/issues"
+        "url": "https://github.com/Aikufurr/Aikufurr/issues"
     },
-    "homepage": "https://github.com/Aikufurr/Website#readme",
+    "homepage": "https://github.com/Aikufurr/Aikufurr#readme",
     "dependencies": {
         "express": "^4.17.1",
         "squirrelly": "^7.6.0"
