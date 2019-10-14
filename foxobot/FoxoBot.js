@@ -43,6 +43,15 @@ fs.readdir("./FoxoBotData/", function(err, files) {
         if (!settings.hasOwnProperty("ranks")) {
             settings.ranks = {};
         }
+        if (!settings.hasOwnProperty("lastMessage")) {
+            settings.lastMessage = {};
+        }
+        if (!settings.hasOwnProperty("spamFilter")) {
+            settings.spamFilter = {
+                "enabled": 0,
+                "cooldown": 1000
+            }
+        }
         if (!settings.hasOwnProperty("toggled")) {
             settings.toggled = [];
         }
@@ -328,21 +337,54 @@ client.on("message", msg => {
         } else {
             var settings = {
                 "ranks": {},
+                "lastMessage": {},
                 "toggled": [],
                 "prefix": global.defaults.prefix,
                 "welcome": 1,
                 "remindme": {},
-                "lists": {}
+                "lists": {},
+                "spamFilter": {
+                    "enabled": 0,
+                    "cooldown": 1000
+                }
             };
             saveJSON(msg.guild.id, settings);
         }
+        if (isNaN(settings.lastMessage[msg.author.id])) {
+            settings.lastMessage[msg.author.id] = 0;
+        }
+        if (Date.now() - settings.lastMessage[msg.author.id] < settings.spamFilter.cooldown && settings.spamFilter.enabled === 1) {
+            msg.delete();
+            msg.reply("You need to cooldown.")
+                .then(msg => {
+                    msg.delete(5000)
+                })
+            return;
+        }
+        settings.lastMessage[msg.author.id] = Date.now();
         if (settings.ranks.hasOwnProperty(msg.author.id)) {
-            settings.ranks[msg.author.id] += 1;
+            if (isNaN(settings.lastMessage[msg.author.id])) {
+                settings.lastMessage[msg.author.id] = 0;
+            }
+            if (Date.now() - settings.lastMessage[msg.author.id] > 1000) {
+                settings.ranks[msg.author.id] += 1;
+            }
+            settings.lastMessage[msg.author.id] = Date.now();
         } else {
             settings.ranks[msg.author.id] = 0;
+            settings.lastMessage[msg.author.id] = Date.now();
         }
         if (!settings.hasOwnProperty("ranks")) {
-            settings.ranks = {};
+            settings.lastMessage = {};
+        }
+        if (!settings.hasOwnProperty("lastMessage")) {
+            settings.lastMessage = {};
+        }
+        if (!settings.hasOwnProperty("spamFilter")) {
+            settings.spamFilter = {
+                "enabled": 0,
+                "cooldown": 1000
+            }
         }
         if (!settings.hasOwnProperty("toggled")) {
             settings.toggled = [];
@@ -836,9 +878,9 @@ client.on("message", msg => {
                         .setDescription(`To get more infomation on a command type \`${settings.prefix}help <option>\` example: \`${settings.prefix}help Music\``)
                         .addField("Settings", `${settings.prefix}settings`, true)
                         .addField("Images", `For a list of image commands type \`${settings.prefix}help images\``, true)
-                        .addField("Music", `${settings.prefix}play <YT url or playlist>\n${settings.prefix}pause\n${settings.prefix}resume\n${settings.prefix}skip\n${settings.prefix}shuffle\n${settings.prefix}volume <0 to 1>\n${settings.prefix}queue\n${settings.prefix}ytinfo <YT url>`, true)
+                        .addField("Music", `${settings.prefix}play <YT url or playlist>\n${settings.prefix}pause\n${settings.prefix}resume\n${settings.prefix}skip\n${settings.prefix}shuffle\n${settings.prefix}volume <0 to 1>\n${settings.prefix}queue\n${settings.prefix}ytinfo <YT url>`, false)
                         .addField("Fun", `${settings.prefix}avatar\n${settings.prefix}rank\n${settings.prefix}remindme`, true)
-                        .addField("Moderation", `${settings.prefix}mute [member] (optional reason)\n${settings.prefix}rank\n${settings.prefix}remindme`, true);
+                        .addField("Moderation", `${settings.prefix}mute [member] (optional reason)\n${settings.prefix}rank`, true);
                     msg.channel.send(em);
                 } else {
                     switch (args[1].toLowerCase()) {
@@ -890,13 +932,47 @@ client.on("message", msg => {
                         .setDescription("To get more infomation on a command type `" + settings.prefix + "settings <option>`")
                         .addField("Prefix", "`" + settings.prefix + "settings prefix <newprefix>`")
                         .addField("Commands", "`" + settings.prefix + "settings commands`")
+                        .addField("Spam filter", `${settings.prefix}settings spam`)
                         .addField("Welcome", `usage: \`${settings.prefix}settings welcome\` Toggles welcome message\n\`${settings.prefix}settings welcome MSG\` Sets a custom welcome message, use \`{user}\` in the message to mention the new user, use \`{guild}\` in the message to show the server name. Example: \`${settings.prefix}settings welcome Welcome {user} to {guild}!\``)
                     msg.channel.send(em);
                 }
-                if (args)
+                if (args[1]) {
+                    if (args[1] === "spam") {
+                        if (!isAdmin) {
+                            msg.reply("You are not an admin.")
+                            break;
+                        }
+                        if (!args[2]) {
+                            var em = new Discord.RichEmbed().setColor(`ORANGE`)
+                                .setTitle("Spam")
+                                .setDescription(`Example, ${settings.prefix}settings spam cooldown 4`)
+                                .addField("toggle", "Toggles the spam filter")
+                                .addField("cooldown", "Sets the spam filter cooldown (seconds)")
+                            msg.channel.send(em);
+                        } else {
+                            if (args[2].toLowerCase() === "toggle") {
+                                if (settings.spamFilter.enabled === 1) {
+                                    settings.spamFilter.enabled = 0;
+                                    msg.channel.send("Spam filter is now off");
+                                    break;
+                                } else if (settings.spamFilter.enabled === 0) {
+                                    settings.spamFilter.enabled = 1;
+                                    msg.channel.send("Spam filter is now on");
+                                    break;
+                                }
+                            } else if (args[2].toLowerCase() === "cooldown") {
+                                if (!args[3] || isNaN(parseInt(args[3]))) {
+                                    msg.reply(`Please enter a number in seconds for the cooldown. Example, ${settings.prefix}settings spam cooldown 4`);
+                                    break;
+                                } else {
+                                    settings.spamFilter.cooldown = parseInt(args[3]) * 1000;
+                                    msg.reply(`Cooldown set to ${args[3]} seconds.`);
+                                }
+                            }
+                            break;
+                        }
+                    }
                     if (args[1] === "welcome") {
-                        let perms = msg.member.permissions;
-                        let isAdmin = perms.has("ADMINISTRATOR");
                         if (!isAdmin) {
                             msg.reply("You are not an admin.")
                             break;
@@ -931,56 +1007,57 @@ client.on("message", msg => {
                         break;
                     }
 
-                if (args[1] === "prefix") {
-                    let perms = msg.member.permissions;
-                    let isAdmin = perms.has("ADMINISTRATOR");
-                    if (!isAdmin) {
-                        msg.reply("You are not an admin.")
-                        break;
-                    }
-                    if (!args[2]) {
-                        var em = new Discord.RichEmbed().setColor(`ORANGE`)
-                            .setTitle("Settings")
-                            .setDescription("Sets the prefix for the server, usefull for servers with multiple bots.")
-                            .addField("prefix", "`" + settings.prefix + "settings prefix <newprefix>`")
-                            .addField("Example", "`" + settings.prefix + "settings prefix !`")
-                        msg.channel.send(em);
-                        break;
-                    }
-                    settings.prefix = args[2];
-
-                    msg.channel.send("Pefix is now set to `" + args[2] + "`")
-                    saveJSON(msg.guild.id, settings);
-                } else if (args[1] === "toggle") {
-                    let perms = msg.member.permissions;
-                    let isAdmin = perms.has("ADMINISTRATOR");
-                    if (!isAdmin) {
-                        msg.reply("You are not an admin.")
-                        break;
-                    }
-                    if (!args[2]) {
-                        var em = new Discord.RichEmbed().setColor(`ORANGE`)
-                            .setTitle("Settings")
-                            .setDescription("How to use toggle.")
-                            .addField("Toggle", "`" + settings.prefix + "settings toggle <command>`")
-                            .addField("Example", "`" + settings.prefix + "settings toggle `", true)
-                        msg.channel.send(em);
-                        break;
-                    }
-                    if (settings.toggled.includes(args[2])) {
-                        let index = settings.toggled.indexOf(args[2]);
-                        if (index > -1) {
-                            settings.toggled.splice(index, 1);
+                    if (args[1] === "prefix") {
+                        let perms = msg.member.permissions;
+                        let isAdmin = perms.has("ADMINISTRATOR");
+                        if (!isAdmin) {
+                            msg.reply("You are not an admin.")
+                            break;
                         }
-                        msg.channel.send("Removed " + args[2] + " from blacklist")
-                    } else {
-                        console.log(args[2]);
-                        settings.toggled.push(args[2]);
-                        console.log(settings.toggled);
-                        msg.channel.send("Added " + args[2] + " to blacklist")
-                    }
+                        if (!args[2]) {
+                            var em = new Discord.RichEmbed().setColor(`ORANGE`)
+                                .setTitle("Settings")
+                                .setDescription("Sets the prefix for the server, usefull for servers with multiple bots.")
+                                .addField("prefix", "`" + settings.prefix + "settings prefix <newprefix>`")
+                                .addField("Example", "`" + settings.prefix + "settings prefix !`")
+                            msg.channel.send(em);
+                            break;
+                        }
+                        settings.prefix = args[2];
 
-                    saveJSON(msg.guild.id, settings);
+                        msg.channel.send("Pefix is now set to `" + args[2] + "`")
+                        saveJSON(msg.guild.id, settings);
+                    } else if (args[1] === "toggle") {
+                        let perms = msg.member.permissions;
+                        let isAdmin = perms.has("ADMINISTRATOR");
+                        if (!isAdmin) {
+                            msg.reply("You are not an admin.")
+                            break;
+                        }
+                        if (!args[2]) {
+                            var em = new Discord.RichEmbed().setColor(`ORANGE`)
+                                .setTitle("Settings")
+                                .setDescription("How to use toggle.")
+                                .addField("Toggle", "`" + settings.prefix + "settings toggle <command>`")
+                                .addField("Example", "`" + settings.prefix + "settings toggle `", true)
+                            msg.channel.send(em);
+                            break;
+                        }
+                        if (settings.toggled.includes(args[2])) {
+                            let index = settings.toggled.indexOf(args[2]);
+                            if (index > -1) {
+                                settings.toggled.splice(index, 1);
+                            }
+                            msg.channel.send("Removed " + args[2] + " from blacklist")
+                        } else {
+                            console.log(args[2]);
+                            settings.toggled.push(args[2]);
+                            console.log(settings.toggled);
+                            msg.channel.send("Added " + args[2] + " to blacklist")
+                        }
+
+                        saveJSON(msg.guild.id, settings);
+                    }
                 }
                 break;
             case "eval":
