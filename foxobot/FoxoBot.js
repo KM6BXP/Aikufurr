@@ -961,11 +961,11 @@ client.on("message", msg => {
                                     break;
                                 }
                             } else if (args[2].toLowerCase() === "cooldown") {
-                                if (!args[3] || isNaN(parseInt(args[3]))) {
+                                if (!args[3] || isNaN(parseFloat(args[3]))) {
                                     msg.reply(`Please enter a number in seconds for the cooldown. Example, ${settings.prefix}settings spam cooldown 4`);
                                     break;
                                 } else {
-                                    settings.spamFilter.cooldown = parseInt(args[3]) * 1000;
+                                    settings.spamFilter.cooldown = parseFloat(args[3]) * 1000;
                                     msg.reply(`Cooldown set to ${args[3]} seconds.`);
                                 }
                             }
