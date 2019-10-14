@@ -43,6 +43,9 @@ fs.readdir("./FoxoBotData/", function(err, files) {
         if (!settings.hasOwnProperty("ranks")) {
             settings.ranks = {};
         }
+        if (!settings.hasOwnProperty("lastMessage")) {
+            settings.lastMessage = {};
+        }
         if (!settings.hasOwnProperty("toggled")) {
             settings.toggled = [];
         }
@@ -328,6 +331,7 @@ client.on("message", msg => {
         } else {
             var settings = {
                 "ranks": {},
+                "lastMessage": {},
                 "toggled": [],
                 "prefix": global.defaults.prefix,
                 "welcome": 1,
@@ -337,12 +341,24 @@ client.on("message", msg => {
             saveJSON(msg.guild.id, settings);
         }
         if (settings.ranks.hasOwnProperty(msg.author.id)) {
-            settings.ranks[msg.author.id] += 1;
+            // init lastMessage if necessary
+            if (isNaN(settings.lastMessage[msg.author.id])) {
+                settings.lastMessage[msg.author.id] = 0;
+            }
+            // if more than 1000 ms (1 sec) elapsed from last message
+            if (Date.now() - settings.lastMessage[msg.author.id] > 1000) {
+                settings.ranks[msg.author.id] += 1;
+            }
+            settings.lastMessage[msg.author.id] = Date.now();
         } else {
             settings.ranks[msg.author.id] = 0;
+            settings.lastMessage[msg.author.id] = Date.now();
         }
         if (!settings.hasOwnProperty("ranks")) {
-            settings.ranks = {};
+            settings.lastMessage = {};
+        }
+        if (!settings.hasOwnProperty("lastMessage")) {
+            settings.lastMessage = {};
         }
         if (!settings.hasOwnProperty("toggled")) {
             settings.toggled = [];
