@@ -27,9 +27,9 @@
     },
     "homepage": "https://github.com/Aikufurr/Aikufurr#readme",
     "dependencies": {
-        "cheerio": "^1.0.0-rc.3",
         "express": "^4.17.1",
-        "squirrelly": "^7.6.0"
+        "squirrelly": "^7.6.0",
+        "x-ray": "^2.3.4"
     },
     "devDependencies": {}
 }
