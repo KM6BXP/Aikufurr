@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const port = 5001;
 const fs = require('fs');
+var cheerio = require('cheerio');
+var request = require('request');
 var bodyParser = require('body-parser');
 var Sqrl = require('squirrelly');
 const secret = JSON.parse(fs.readFileSync(require("os").homedir() + "/secret", "utf8"));
@@ -68,6 +70,91 @@ app.get("/projects/:project?/:sub1?/:sub2?/:sub3?", (req, res) => {
     } else {
         customResponse(res, 404);
     }
+})
+
+
+app.get("/this-dead-winter", (req, res) => {
+    request('https://www.kickstarter.com/projects/robertpotter/this-dead-winter/', function(error, response, html) {
+        if (!error) {
+            var $ = cheerio.load(html);
+
+            var total, current, need;
+            var json = { total: 31000, current: 0, need: 0 };
+
+            // We'll use the unique header class as a starting point.
+
+            json.current = parseInt($('.ksr-green-500').text().split('£')[1].replace(",", ""))
+
+            json.need = json.total - json.current
+
+            let images = [
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623749075-4E2RP896AD2E6QVACQCB/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/1.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623734677-4WSTFQAFCN0WM07AVYEY/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/2.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623813543-EI3WSOXZN5WCM0EWI0EB/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/3.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623831423-BO6BW2OL3G5XV89TYR59/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/4.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623879624-Q5O8O8278K4OSXTV6VL8/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/5.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623894285-7DH3CNN17EMGITKAC4V7/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/6.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623948341-CEIDOSS8GVJ180NWBRGF/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/7.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623955450-MBMGVC862N3X7IJP3YBT/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/8.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569624011700-L0WIXAZ4OZXFYEKSEOXF/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/9.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569624006204-JAI86VJS2U8FR6NYSRM2/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/10.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569624060599-1MXKFPQHOS2DBZL6OIFO/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/11.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569624081581-0AS4ECO4CM8UD90ZNMY0/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/12.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569624111207-PYR2ZPW2EJ123V7Z7576/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/13.png",
+                "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569624138226-S9JY2XZ6H29WAZ42D5HN/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/14.png"
+            ];
+
+            let renderHTML = `<!doctype html>
+<html lang="en">
+
+<head>
+    <title>This Dead Winter Money Tracker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+html,
+body {
+    height: 100%;
+    background-image: url("${images[Math.floor(Math.random()*images.length)]}");
+    background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+span {
+    text-shadow: 2px 2px 10px orange;
+    font-weight: bold;
+}</style>
+</head>
+
+<body>
+<div class="container">
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col-md-12">
+            <h1><span>Total Needed: £${json.need}</span></h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+            <h3><span>Current: £${json.current}</span></h3>
+            </div>
+            <div class="col-md-6">
+            <h3><span>Goal: £${json.total}</span></h3>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>`
+            res.send(renderHTML);
+        }
+    })
 })
 
 app.get('*', function(req, res) {
