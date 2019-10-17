@@ -75,12 +75,16 @@ app.get("/projects/:project?/:sub1?/:sub2?/:sub3?", (req, res) => {
 
 app.get("/this-dead-winter", (req, res) => {
     x_ray('https://www.kickstarter.com/projects/robertpotter/this-dead-winter', '.ksr-green-500')((e, current) => {
-        var total, need;
-        var json = { total: 31000, current: 0, need: 0 };
+        var json = { current: 0 };
 
         json.current = parseInt(current.split('£')[1].replace(",", ""))
 
-        json.need = json.total - json.current
+        json.need = json.total - json.current;
+        json.switch = 45000 - json.current;
+        json.music = 60000 - json.current;
+        json.multi = 75000 - json.current;
+        json.puzzles = 92000 - json.current;
+        json.spirits = 104000 - json.current;
 
         let images = [
             "https://images.squarespace-cdn.com/content/v1/5d431d97d0d7d800016c6fc2/1569623749075-4E2RP896AD2E6QVACQCB/ke17ZwdGBToddI8pDm48kPTrHXgsMrSIMwe6YW3w1AZ7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z4YTzHvnKhyp6Da-NYroOW3ZGjoBKy3azqku80C789l0p52bY8kZn6Mpkp9xtPUVLhvLurswpbKwwoDWqBh58NLxQZMhB36LmtxTXHHtLwR3w/1.png",
@@ -131,16 +135,25 @@ span {
 <div class="container">
     <div class="container-fluid text-center">
         <div class="row">
-            <div class="col-md-12">
-            <h1><span>Total Needed: £${json.need}</span></h1>
-            </div>
+        <div class="col-md-3">
+        <h2><span>Switch Port: £${json.switch}</span></h2>
+        </div>
+        <div class="col-md-3">
+        <h2><span>Physical Music: £${json.music}</span></h2>
+        </div>
+        <div class="col-md-3">
+        <h2><span>Multiplayer: £${json.multi}</span></h2>
+        </div>
+        <div class="col-md-3">
+        <h2><span>Extra Puzzles: £${json.puzzles}</span></h2>
+        </div>
+        <div class="col-md-3">
+        <h2><span>Extra Spirits: £${json.spirits}</span></h2>
+        </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
             <h3><span>Current: £${json.current}</span></h3>
-            </div>
-            <div class="col-md-6">
-            <h3><span>Goal: £${json.total}</span></h3>
             </div>
         </div>
     </div>
