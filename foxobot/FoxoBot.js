@@ -1119,8 +1119,12 @@ client.on("message", msg => {
                     }
 
                     addDate(now, args[1]);
-                    settings.remindme[msg.author.id].push([now.toString(), item]);
-                    msg.reply(`Added \`${ item }\` to your RemindMes and will remind you at \`${now.toString()}\``);
+                    if (now.toString() != "Invalid Date") {
+                        settings.remindme[msg.author.id].push([now.toString(), item]);
+                        msg.reply(`Added \`${ item }\` to your RemindMes and will remind you at \`${now.toString()}\``);
+                    } else {
+                        msg.reply("You have entered an `Invalid Date`, please try again.")
+                    }
                 }
                 break;
             case "play":
