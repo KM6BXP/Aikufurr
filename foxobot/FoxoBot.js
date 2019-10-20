@@ -401,6 +401,7 @@ client.on("message", msg => {
                 .then(msg => {
                     msg.delete(5000)
                 })
+            return;
         }
         if (settings.ranks.hasOwnProperty(msg.author.id)) {
             if (isNaN(settings.lastMessage[msg.author.id])) {
