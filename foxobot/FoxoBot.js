@@ -395,13 +395,16 @@ client.on("message", msg => {
                 return;
             }
         }
-        if (Date.now() - settings.lastMessage[msg.author.id] < settings.spamFilter.cooldown && settings.spamFilter.enabled === 1) {
-            msg.delete();
-            msg.reply("You need to cooldown.")
-                .then(msg => {
-                    msg.delete(5000)
-                })
-            return;
+
+        if (!msg.member.permissions.has("ADMINISTRATOR")) {
+            if (Date.now() - settings.lastMessage[msg.author.id] < settings.spamFilter.cooldown && settings.spamFilter.enabled === 1) {
+                msg.delete();
+                msg.reply("You need to cooldown.")
+                    .then(msg => {
+                        msg.delete(5000)
+                    })
+                return;
+            }
         }
         if (settings.ranks.hasOwnProperty(msg.author.id)) {
             if (isNaN(settings.lastMessage[msg.author.id])) {
