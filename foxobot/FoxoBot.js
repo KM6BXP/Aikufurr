@@ -353,27 +353,6 @@ client.on("message", msg => {
         if (isNaN(settings.lastMessage[msg.author.id])) {
             settings.lastMessage[msg.author.id] = 0;
         }
-        if (Date.now() - settings.lastMessage[msg.author.id] < settings.spamFilter.cooldown && settings.spamFilter.enabled === 1) {
-            msg.delete();
-            msg.reply("You need to cooldown.")
-                .then(msg => {
-                    msg.delete(5000)
-                })
-            return;
-        }
-        settings.lastMessage[msg.author.id] = Date.now();
-        if (settings.ranks.hasOwnProperty(msg.author.id)) {
-            if (isNaN(settings.lastMessage[msg.author.id])) {
-                settings.lastMessage[msg.author.id] = 0;
-            }
-            if (Date.now() - settings.lastMessage[msg.author.id] > 1000) {
-                settings.ranks[msg.author.id] += 1;
-            }
-            settings.lastMessage[msg.author.id] = Date.now();
-        } else {
-            settings.ranks[msg.author.id] = 0;
-            settings.lastMessage[msg.author.id] = Date.now();
-        }
         if (!settings.hasOwnProperty("ranks")) {
             settings.lastMessage = {};
         }
@@ -415,6 +394,24 @@ client.on("message", msg => {
                 msg.delete();
                 return;
             }
+        }
+        if (Date.now() - settings.lastMessage[msg.author.id] < settings.spamFilter.cooldown && settings.spamFilter.enabled === 1) {
+            msg.delete();
+            msg.reply("You need to cooldown.")
+                .then(msg => {
+                    msg.delete(5000)
+                })
+        }
+        if (settings.ranks.hasOwnProperty(msg.author.id)) {
+            if (isNaN(settings.lastMessage[msg.author.id])) {
+                settings.lastMessage[msg.author.id] = 0;
+            } else if (Date.now() - settings.lastMessage[msg.author.id] > 1000) {
+                settings.ranks[msg.author.id] += 1;
+            }
+            settings.lastMessage[msg.author.id] = Date.now();
+        } else {
+            settings.ranks[msg.author.id] = 0;
+            settings.lastMessage[msg.author.id] = Date.now();
         }
 
         if (!msg.content.startsWith(settings.prefix)) return;
