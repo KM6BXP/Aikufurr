@@ -888,7 +888,7 @@ client.on("message", msg => {
                         case "image":
                         case "images":
                             request({
-                                uri: "https://aikufurr.com/fluffster/api/endpoints",
+                                uri: "https://aikufurr.com/api/images",
                                 method: "GET",
                                 json: true
                             }, (error, response, body) => {
