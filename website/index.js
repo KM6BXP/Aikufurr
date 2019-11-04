@@ -106,7 +106,16 @@ app.get("/this-dead-winter", (req, res) => {
         let renderHTML = `<!doctype html>
 <html lang="en">
 
-<head>
+<head><!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-151503503-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-151503503-1');
+</script>
+
     <title>This Dead Winter Money Tracker</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
@@ -129,7 +138,16 @@ span {
     text-shadow: 2px 2px 10px orange;
     font-weight: bold;
 }</style>
-</head>
+</head><!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-151503503-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-151503503-1');
+</script>
+
 
 <body>
 <div class="container">
