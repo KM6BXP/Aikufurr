@@ -28,6 +28,7 @@
     "homepage": "https://github.com/Aikufurr/Aikufurr#readme",
     "dependencies": {
         "express": "^4.17.1",
+        "express-fileupload": "^1.1.6-alpha.6",
         "squirrelly": "^7.6.0",
         "x-ray": "^2.3.4"
     },
