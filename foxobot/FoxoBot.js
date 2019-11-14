@@ -79,7 +79,7 @@ fs.readdir("./FoxoBotData/", function(err, files) {
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    client.user.setActivity("Foxes Playing", {
+    client.user.setActivity("Foxes Playing 🦊", {
         type: "WATCHING"
     });
     console.log(`Logged into ${client.guilds.array().length} guilds`);
