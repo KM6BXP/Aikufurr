@@ -7,7 +7,8 @@ var Xray = require('x-ray');
 var x_ray = Xray();
 var bodyParser = require('body-parser');
 var Sqrl = require('squirrelly');
-const secret = JSON.parse(fs.readFileSync(require("os").homedir() + "/secret", "utf8"));
+//const secret = JSON.parse(fs.readFileSync(require("os").homedir() + "/secret", "utf8"));
+var secret = "dev";
 
 var procal = secret.env === "pro" ? "https" : "http";
 
@@ -171,4 +172,21 @@ router.get("/images/:data?/:image?", (req, res) => {
     }
 })
 
+router.get("/ytdl/:version?", (req, res) => {
+    if (req.params.version == null) {
+        fs.readdir("public/api/ytdl/", (err, files) => {
+            if (err) {
+                console.log("Unable to scan dir: " + err);
+                return
+            }
+            let dirs = [];
+            files.forEach((dir) => {
+                dirs.push(`${procal + '://' + req.get('host')}/api/ytdl/${dir}`);
+            })
+            res.json(dirs.pop());
+        })
+    } else {
+        res.sendFile(`${__dirname}/public/api/ytdl/${req.params.version}`)
+    }
+})
 app.listen(port, () => console.log(`app listening on port ${port}!`))
