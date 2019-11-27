@@ -130,8 +130,8 @@ public class Commands extends ListenerAdapter {
                 JSONArray toggledCommandsArray = new JSONArray(guildData.get("toggledCommands").toString());
 
                 // Throws java.lang.StringIndexOutOfBoundsException: String index out of range:  0 Error idk why
-                if (("" + args[0].charAt(0)).equalsIgnoreCase(prefix)) {
-                    args[0] = args[0].substring(1);
+                if (args[0].startsWith(prefix)) {
+					args[0] = args[0].substring(prefix.length());
                     for (int i = 0; i < toggledCommandsArray.length(); i++) {
                         System.out.println(args[0] + " " + toggledCommandsArray.get(i));
                         if (args[0].equals(toggledCommandsArray.get(i))) {
