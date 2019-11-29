@@ -27,6 +27,7 @@ import org.json.simple.parser.ParseException;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -77,12 +78,23 @@ public class Commands extends ListenerAdapter {
         guildItems.putIfAbsent("spamFilterCooldown", 3);
         guildItems.putIfAbsent("remindMe", remindMe);
 
-        PrintWriter writer = new PrintWriter("guildData/" + guild.getId() + ".json",
-                "UTF-8");
+        PrintWriter writer = new PrintWriter("guildData/" + guild.getId() + ".json", "UTF-8");
         writer.println(guildItems.toString());
         writer.close();
 
         return guildItems;
+    }
+
+    public User getUserFromMention(String mention) {
+        if (mention.startsWith("<@") && mention.endsWith(">")) {
+            mention = mention.replaceAll("<", "");
+            mention = mention.replaceAll(">", "");
+            mention = mention.replaceAll("@", "");
+            mention = mention.replaceAll("!", "");
+
+            return FoxoBot.jda.getUserById(mention);
+        }
+        return null;
     }
 
     public void addDate(Calendar cal, String t) {
@@ -117,7 +129,8 @@ public class Commands extends ListenerAdapter {
 
                 JSONObject guildData = getGuildData(event.getGuild());
 
-                String prefix = guildData.get("prefix").toString();
+                //String prefix = guildData.get("prefix").toString();
+                String prefix = "=";
 
                 JSONObject ranksData = (JSONObject) guildData.get("ranks");
 
@@ -129,9 +142,10 @@ public class Commands extends ListenerAdapter {
                 }
                 JSONArray toggledCommandsArray = new JSONArray(guildData.get("toggledCommands").toString());
 
-                // Throws java.lang.StringIndexOutOfBoundsException: String index out of range:  0 Error idk why
-                if (("" + args[0].charAt(0)).equalsIgnoreCase(prefix)) {
-                    args[0] = args[0].substring(1);
+                // Throws java.lang.StringIndexOutOfBoundsException: String index out of range:
+                // 0 Error idk why
+                if (args[0].startsWith(prefix)) {
+                    args[0] = args[0].substring(prefix.length());
                     for (int i = 0; i < toggledCommandsArray.length(); i++) {
                         System.out.println(args[0] + " " + toggledCommandsArray.get(i));
                         if (args[0].equals(toggledCommandsArray.get(i))) {
@@ -240,15 +254,30 @@ public class Commands extends ListenerAdapter {
                             subranked.put(m.value);
                             ranked.put(subranked);
                         }
-                        for (int i = 0; i < ranked.length(); i++) {
-                            JSONArray rankedArray = new JSONArray(ranked.get(i).toString());
-                            if (event.getAuthor().getId().equals(rankedArray.get(0))) {
-                                EmbedBuilder em = new EmbedBuilder();
-                                em.setColor(Color.ORANGE);
-                                em.setTitle(event.getAuthor().getName() + "'s Rank");
-                                em.addField("Rank", i + "/" + event.getGuild().getMembers().size(), true);
-                                em.addField("Messages", rankedArray.get(1).toString(), true);
-                                event.getChannel().sendMessage(em.build()).queue();
+                        if (args.length == 1) {
+                            for (int i = 0; i < ranked.length(); i++) {
+                                JSONArray rankedArray = new JSONArray(ranked.get(i).toString());
+                                if (event.getAuthor().getId().equals(rankedArray.get(0))) {
+                                    EmbedBuilder em = new EmbedBuilder();
+                                    em.setColor(Color.ORANGE);
+                                    em.setTitle(event.getAuthor().getName() + "'s Rank");
+                                    em.addField("Rank", i + 1 + "/" + event.getGuild().getMembers().size(), true);
+                                    em.addField("Messages", rankedArray.get(1).toString(), true);
+                                    event.getChannel().sendMessage(em.build()).queue();
+                                }
+                            }
+                        } else {
+                            User mentionedUser = getUserFromMention(args[1]);
+                            for (int i = 0; i < ranked.length(); i++) {
+                                JSONArray rankedArray = new JSONArray(ranked.get(i).toString());
+                                if (mentionedUser.getId().equals(rankedArray.get(0))) {
+                                    EmbedBuilder em = new EmbedBuilder();
+                                    em.setColor(Color.ORANGE);
+                                    em.setTitle(mentionedUser.getName() + "'s Rank");
+                                    em.addField("Rank", i + 1 + "/" + event.getGuild().getMembers().size(), true);
+                                    em.addField("Messages", rankedArray.get(1).toString(), true);
+                                    event.getChannel().sendMessage(em.build()).queue();
+                                }
                             }
                         }
 
@@ -259,7 +288,7 @@ public class Commands extends ListenerAdapter {
                             em.setColor(Color.ORANGE);
                             em.setDescription(
                                     "If a command has a `*` next to it you can type `help [command]` to get for info on it.");
-                            em.addField("Fun", "`pick`*\n`flip` or `flip-a-coin` or `coin`", true);
+                            em.addField("Fun", "`pick`*\n`flip` or `flip-a-coin` or `coin`\n`rank`*", true);
                             em.addField("Images *",
                                     String.format("For a list of all the images %s can send, type `help images`",
                                             event.getJDA().getSelfUser().getName()),
@@ -274,7 +303,16 @@ public class Commands extends ListenerAdapter {
                                 em.addField("Example usage", "pick\nOption1\nOption2\nOption3", false);
                                 event.getChannel().sendMessage(em.build()).queue();
                             }
-                            if (args[1].equalsIgnoreCase("images")) {
+                            if (args[1].equalsIgnoreCase("rank")) {
+                                EmbedBuilder em = new EmbedBuilder();
+                                em.setTitle("Help - Rank");
+                                em.setColor(Color.ORANGE);
+                                em.setDescription("Displays your rank in this guild");
+                                em.addField("Example usage to get your rank", "rank", false);
+                                em.addField("Example usage to get someone elses rank", "rank @person", false);
+                                event.getChannel().sendMessage(em.build()).queue();
+                            }
+                            if (args[1].equalsIgnoreCase("images") || args[1].equalsIgnoreCase("image")) {
                                 try {
                                     String result = web.get("https://aikufurr.com/api/images");
                                     ArrayList<String> res = converter.stringToArrayList(result);
@@ -288,7 +326,8 @@ public class Commands extends ListenerAdapter {
                                     em.setTitle("Help - Images");
                                     em.setColor(Color.ORANGE);
                                     em.setDescription("All images that start with `y` are nsfw");
-                                    em.addField("Images", out, false);
+                                    em.addField("Images", out, true);
+                                    em.addField("Usage", "[image] (amount)", true);
                                     event.getChannel().sendMessage(em.build()).queue();
                                 } catch (Exception e) {
                                     // TODO Auto-generated catch block
@@ -301,11 +340,33 @@ public class Commands extends ListenerAdapter {
                             if (!event.getChannel().isNSFW() && args[0].startsWith("y")) {
                                 return;
                             }
-                            String result = web.get("https://aikufurr.com/api/images/" + args[0]);
-                            EmbedBuilder em = new EmbedBuilder();
-                            em.setColor(Color.ORANGE);
-                            em.setImage((String) result.replaceAll("\"", ""));
-                            event.getChannel().sendMessage(em.build()).queue();
+                            int spam = 1;
+                            for (int i = 0; i < args.length; i++) {
+                                args[i].replaceAll(" ", "");
+                            }
+                            if (args.length == 2) {
+                                try {
+                                    spam = Integer.parseInt(args[1]);
+                                    if (spam > 20) {
+                                        event.getChannel().sendMessage("The limit is 20 per command").queue();
+                                        return;
+                                    }
+                                } catch (Exception e) {
+                                    spam = 1;
+                                }
+                                if (args[1].startsWith("<")) {
+                                    spam = 1;
+                                };
+                            } else {
+                                spam = 1;
+                            }
+                            for (int i = 0; i < spam; i++) {
+                                String result = web.get("https://aikufurr.com/api/images/" + args[0]);
+                                EmbedBuilder em = new EmbedBuilder();
+                                em.setColor(Color.ORANGE);
+                                em.setImage((String) result.replaceAll("\"", "").replaceAll(" ", "%20"));
+                                event.getChannel().sendMessage(em.build()).queue();
+                            }
                         } catch (Exception e) {
                             // TODO: handle exception
                             e.printStackTrace();
