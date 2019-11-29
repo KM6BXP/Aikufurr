@@ -129,8 +129,8 @@ public class Commands extends ListenerAdapter {
 
                 JSONObject guildData = getGuildData(event.getGuild());
 
-                //String prefix = guildData.get("prefix").toString();
-                String prefix = "=";
+                String prefix = guildData.get("prefix").toString();
+                //String prefix = "=";
 
                 JSONObject ranksData = (JSONObject) guildData.get("ranks");
 
