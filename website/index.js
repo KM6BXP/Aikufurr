@@ -36,7 +36,7 @@ function customResponse(response, code) {
 var router = express.Router();
 app.use('/api', router);
 
-app.post('/upload', function(req, res) {
+app.post('/upload', function (req, res) {
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('No files were uploaded.');
     }
@@ -45,7 +45,7 @@ app.post('/upload', function(req, res) {
     let sampleFile = req.files.sampleFile;
 
     // Use the mv() method to place the file somewhere on your server
-    sampleFile.mv(`${__dirname}/public/upload/${req.files.sampleFile.name}`, function(err) {
+    sampleFile.mv(`${__dirname}/public/upload/${req.files.sampleFile.name}`, function (err) {
         if (err)
             return res.status(500).send(err);
 
@@ -126,20 +126,20 @@ app.get("/projects/:project?/:sub1?/:sub2?/:sub3?", (req, res) => {
 })
 
 
-app.get('*', function(req, res) {
+app.get('*', function (req, res) {
     customResponse(res, 404);
 });
 
 
 /* ####### API ####### */
 
-router.post('*', function(req, res) {
+router.post('*', function (req, res) {
     res.status(405).json({
         error: "API is GET only"
     });
 });
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     res.json([`${procal + '://' + req.get('host')}/api/images`]);
 });
 
@@ -156,17 +156,22 @@ router.get("/images/:data?/:image?", (req, res) => {
             })
             res.json(dirs);
         })
+
     } else if (req.params.image == null) {
-        fs.readdir(`public/api/images/${req.params.data}`, (err, files) => {
-            if (err) {
-                console.log("Unable to scan dir: " + err);
-                return
-            }
+        if (fs.existsSync(`public/api/images/${req.params.data}`)) {
+            fs.readdir(`public/api/images/${req.params.data}`, (err, files) => {
+                if (err) {
+                    console.log("Unable to scan dir: " + err);
+                    return
+                }
 
-            let file = files[Math.floor(Math.random() * files.length)];
+                let file = files[Math.floor(Math.random() * files.length)];
 
-            res.json(`${procal + '://' + req.get('host')}/api/images/${req.params.data}/${file}`);
-        })
+                res.json(`${procal + '://' + req.get('host')}/api/images/${req.params.data}/${file}`);
+            })
+        } else {
+            res.send("");
+        }
     } else {
         res.sendFile(`${__dirname}/public/api/images/${req.params.data}/${req.params.image}`)
     }
