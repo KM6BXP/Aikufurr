@@ -174,6 +174,7 @@ public class Commands extends ListenerAdapter {
                         String randomItem = headTails.get(index);
                         event.getChannel().sendMessage(randomItem).queue();
                     } else if (args[0].split("\n")[0].equalsIgnoreCase("pick")) {
+                        if (args.length == 1) {return;}
                         Random r = new Random();
                         int size = lines.length;
                         int index = r.nextInt(size);
