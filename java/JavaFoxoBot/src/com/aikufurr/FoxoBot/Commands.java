@@ -343,6 +343,7 @@ public class Commands extends ListenerAdapter {
                             if (!event.getChannel().isNSFW() && args[0].startsWith("y")) {
                                 return;
                             }
+                            if (web.get("https://aikufurr.com/api/images/" + args[0]) == ""){return;}
                             int spam = 1;
                             for (int i = 0; i < args.length; i++) {
                                 args[i].replaceAll(" ", "");
