@@ -230,7 +230,9 @@ public class Commands extends ListenerAdapter {
                         }
                     } else if (args[0].equalsIgnoreCase("test1")) {
                         // TODO
-                    } else if (args[0].equalsIgnoreCase("rank")) {
+                    }else if (args[0].equalsIgnoreCase("hugself")) {
+                      event.getChannel().sendMessage("I'm sorry").queue();
+                    }else if (args[0].equalsIgnoreCase("rank")) {
                         org.json.JSONObject obj = new org.json.JSONObject(guildData.get("ranks").toString());
                         List<rankClass> list = new ArrayList<>();
                         Iterator<?> keys = obj.keys();
