@@ -381,7 +381,7 @@ public class Commands extends ListenerAdapter {
                                 EmbedBuilder em = new EmbedBuilder();
                                 
                                	org.json.JSONObject imageMessages = new org.json.JSONObject();
-                                
+
                             	JSONArray hug = new JSONArray();
                             	hug.put("USER1 gives USER2 a big ol' hug");
                             	hug.put("USER1 sneaks up behind USER2 and gives them a surprise hug");
@@ -391,7 +391,37 @@ public class Commands extends ListenerAdapter {
                             	hug.put("USER2 wasn't suspecting anything at first, but then suddenly USER1 appears and hugs them!");
                             	hug.put("USER1 scoots closer over to USER2 on a park bench, then wraps their arms around them, giving them an unsuspecting hug");
                             	hug.put("USER1 opens their arms for USER2 so they could get a lovable hug from USER1");
+                            	hug.put("USER1 gives USER2 a loving hug");
                                	imageMessages.put("hug", hug);
+                            	JSONArray kiss = new JSONArray();
+                            	kiss.put("USER1 gives USER2 a loving kiss");
+                            	kiss.put("USER1 kisses USER2");
+                            	kiss.put("USER2 has been kissed by USER1");
+                            	kiss.put("USER1 lovingly kisses USER2");
+                               	imageMessages.put("kiss", kiss);
+                            	JSONArray cuddle = new JSONArray();
+                            	cuddle.put("USER1 gives USER2 a loving cuddle");
+                            	cuddle.put("USER1 cuddles USER2");
+                            	cuddle.put("USER1 sits down next to USER2 and cuddles them");
+                            	cuddle.put("USER2 has been cuddles by USER1");
+                            	cuddle.put("USER1 lovingly cuddles USER2");
+                               	imageMessages.put("cuddle", cuddle);
+                            	JSONArray hold = new JSONArray();
+                            	hold.put("USER1 holds USER2 close");
+                            	hold.put("USER1 holds USER2 close to them");
+                            	hold.put("USER1 holds USER2 tightly");
+                            	hold.put("USER1 holds USER2");
+                            	hold.put("USER1 sits down next to USER2 and holds them");
+                            	hold.put("USER1 sits down next to USER2 and holds them tight");
+                            	hold.put("USER1 lovingly holds USER2");
+                            	hold.put("USER1 lovingly holds USER2 close to them");
+                               	imageMessages.put("hold", hold);
+                            	JSONArray lick = new JSONArray();
+                            	lick.put("USER1 licks USER2");
+                            	lick.put("USER1 shyly gives USER2 a lick");
+                            	lick.put("USER1 lovingly licks USER2");
+                            	lick.put("USER2 gets a lick from USER1");
+                               	imageMessages.put("lick", lick);
                                	
                                	if (args.length > 1) {
                                		if (!isNumeric(args[1])) {
