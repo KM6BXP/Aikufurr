@@ -45,6 +45,18 @@ public class Commands extends ListenerAdapter {
     private static Web web = new Web();
     private static Conversion converter = new Conversion();
 
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+    
     @SuppressWarnings("unchecked")
     public JSONObject getGuildData(Guild guild) throws JSONException, IOException, ParseException {
         JSONObject guildItems;
@@ -367,6 +379,37 @@ public class Commands extends ListenerAdapter {
                             for (int i = 0; i < spam; i++) {
                                 String result = web.get("https://aikufurr.com/api/images/" + args[0]);
                                 EmbedBuilder em = new EmbedBuilder();
+                                
+                               	org.json.JSONObject imageMessages = new org.json.JSONObject();
+                                
+                            	JSONArray hug = new JSONArray();
+                            	hug.put("USER1 gives USER2 a big ol' hug");
+                            	hug.put("USER1 sneaks up behind USER2 and gives them a surprise hug");
+                            	hug.put("USER1 hugs USER2 with a very warm smile");
+                            	hug.put("USER1 lunges at USER2, wrapping their arms around lovingly");
+                            	hug.put("USER1 blushes a little bit, carefully approaching USER2 and giving them a tender hug");
+                            	hug.put("USER2 wasn't suspecting anything at first, but then suddenly USER1 appears and hugs them!");
+                            	hug.put("USER1 scoots closer over to USER2 on a park bench, then wraps their arms around them, giving them an unsuspecting hug");
+                            	hug.put("USER1 opens their arms for USER2 so they could get a lovable hug from USER1");
+                               	imageMessages.put("hug", hug);
+                               	
+                               	if (args.length > 1) {
+                               		if (!isNumeric(args[1])) {
+                               			Random r = new Random();
+                                        int size = imageMessages.getJSONArray(args[0]).length();
+                                        int index = r.nextInt(size);
+                                        String randomItem = imageMessages.getJSONArray(args[0]).getString(index);
+                                        randomItem = randomItem.replaceAll("USER1", event.getAuthor().getName());
+                                        if (args[1].startsWith("<") && args[1].endsWith(">")) {
+                                        	randomItem = randomItem.replaceAll("USER2", getUserFromMention(args[1]).getName());
+                                        } else {
+                                        	randomItem = randomItem.replaceAll("USER2", args[1]);
+                                        }
+                                        
+                                   		em.setDescription(randomItem);
+                               		}
+                               	}
+                                
                                 em.setColor(Color.ORANGE);
                                 em.setImage((String) result.replaceAll("\"", "").replaceAll(" ", "%20"));
                                 event.getChannel().sendMessage(em.build()).queue();
