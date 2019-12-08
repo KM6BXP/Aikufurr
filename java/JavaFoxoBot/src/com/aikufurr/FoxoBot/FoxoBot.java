@@ -21,19 +21,17 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public class FoxoBot {
     public static JDA jda;
-    public static TextChannel logChannel; 
+    public static TextChannel logChannel;
     public static Boolean logEnabled = false;
-    
 
     // Start
-    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, LoginException, InterruptedException {
+    public static void main(String[] args)
+            throws JsonParseException, JsonMappingException, IOException, LoginException, InterruptedException {
         // read JSON from a file
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.readValue(
-                new File("data.json"),
-                new TypeReference<Map<String, Object>>() {
+        Map<String, Object> map = mapper.readValue(new File("data.json"), new TypeReference<Map<String, Object>>() {
         });
-        
+
         jda = new JDABuilder(AccountType.BOT).setToken((String) map.get("token")).build();
         jda.getPresence().setActivity(Activity.watching("Foxes Playing"));
         jda.addEventListener(new Commands());
@@ -52,26 +50,31 @@ public class FoxoBot {
             System.out.print(" || " + g.getName());
         }
         System.out.println(" |@ Total: " + jda.getGuilds().size());
-        if (FoxoBot.logEnabled) {logChannel.sendMessage("Initializing Timer Class").queue();}
+        if (FoxoBot.logEnabled) {
+            logChannel.sendMessage("Initializing Timer Class").queue();
+        }
         Timer timer = new Timer();
         timer.schedule(new TimerTaskClass(), 0, 5000);
-        if (FoxoBot.logEnabled) {logChannel.sendMessage("Initialized Timer Class").queue();}
-        
-        
-        if (FoxoBot.logEnabled) {logChannel.sendMessage("CWD: " + System.getProperty("user.dir")).queue();}
-        
-        
-        if (FoxoBot.logEnabled) {logChannel.sendMessage("Started").queue();}
-        
+        if (FoxoBot.logEnabled) {
+            logChannel.sendMessage("Initialized Timer Class").queue();
+        }
+
+        if (FoxoBot.logEnabled) {
+            logChannel.sendMessage("CWD: " + System.getProperty("user.dir")).queue();
+        }
+
+        if (FoxoBot.logEnabled) {
+            logChannel.sendMessage("Started").queue();
+        }
+
     }
-    
+
 //    ObjectMapper mapper = new ObjectMapper();
 //    Map<String, Object> map = new HashMap<String, Object>();
 //    map.put("name", "Suson");
 //    map.put("age", 26);
 //    mapper.writeValue(new File("data.json"), map);
-    
-    
+
 //    ObjectMapper mapper = new ObjectMapper();
 //    Map<String, Object> map = mapper.readValue(
 //            new File("c:\\myData.json"),
