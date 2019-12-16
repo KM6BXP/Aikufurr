@@ -134,6 +134,9 @@ public class Commands extends ListenerAdapter {
 
     @SuppressWarnings("unchecked")
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+        if (!event.getGuild().getName().toLowerCase().contains("save")){
+            System.out.println("GUILD: " + event.getGuild().getName() + " SENDER: " + event.getAuthor().getName() + " MSG: " + event.getMessage().getContentRaw());
+        }
         try {
             if (event.getMessage().getAuthor().getId() != event.getJDA().getSelfUser().getId()) {
                 String[] lines = event.getMessage().getContentRaw().split("\n");
@@ -164,7 +167,7 @@ public class Commands extends ListenerAdapter {
                             return;
                         }
                     }
-//                if (args[1].equalsIgnoreCase("init")) {
+//                if (args[0].equalsIgnoreCase("init")) {
 //                    event.getMessage().addReaction("kade:550137030844088321").queue();
 //                    event.getMessage().addReaction("nicole:550137074515443734").queue();
 //                    event.getMessage().addReaction("riley:550137124222009384").queue();
@@ -194,6 +197,14 @@ public class Commands extends ListenerAdapter {
                         int index = r.nextInt(size);
                         String randomItem = lines[index];
                         event.getChannel().sendMessage(randomItem).queue();
+                    } else if (args[0].split("\n")[0].equalsIgnoreCase("roll")) {
+                        if (args.length == 1 || !isNumeric(args[1])) {
+                            event.getChannel().sendMessage("You must enter a number").queue();
+                            return;
+                        }
+                        Random r = new Random();
+                        int index = r.nextInt(Integer.parseInt(args[1]));
+                        event.getChannel().sendMessage("Rolled: " + index).queue();
                     } else if (args[0].equalsIgnoreCase("invite")) {
                         event.getChannel().sendMessage(
                                 "My Invite Link: https://discordapp.com/api/oauth2/authorize?client_id=618802156283363328&permissions=8&scope=bot");
