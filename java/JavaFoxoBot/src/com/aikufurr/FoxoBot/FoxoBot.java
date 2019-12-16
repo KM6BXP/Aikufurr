@@ -36,11 +36,10 @@ public class FoxoBot {
 
     // Start
     @SuppressWarnings("unchecked")
-    public static void main(String[] args)
-            throws JsonParseException, JsonMappingException, IOException, LoginException, InterruptedException, ParseException {
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException, LoginException,
+            InterruptedException, ParseException {
         // read JSON from a file
-        
-        
+
         JSONObject dataFile;
 
         File f = new File("data.json");
@@ -58,28 +57,22 @@ public class FoxoBot {
         PrintWriter writer = new PrintWriter("data.json", "UTF-8");
         writer.println(dataFile.toString());
         writer.close();
-        
-        
-        
+
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.readValue(new File("data.json"), new TypeReference<Map<String, Object>>() {
         });
 
-        if (((String) map.get("token")).contains("enter-token-here")) { System.out.println("Please open data.json and enter token"); return;};
-        
+        if (((String) map.get("token")).contains("enter-token-here")) {
+            System.out.println("Please open data.json and enter token");
+            return;
+        }
+
         jda = new JDABuilder(AccountType.BOT).setToken((String) map.get("token")).build();
         jda.getPresence().setActivity(Activity.watching("Foxes Playing"));
         jda.addEventListener(new Commands());
         jda.addEventListener(new GenericMessageReactionAdd());
         jda.addEventListener(new GuildEvents());
         jda.awaitReady();
-        String ia = jda.getGuildById("448279825786863626").getTextChannelById("523952760568414209").createInvite().complete().getUrl();
-        System.out.println(ia);
-        logChannel = jda.getGuildById("485960253016637453").getTextChannelById("648576645279776770");
-        System.out.println("Set log channel to: " + logChannel.getName());
-        if (FoxoBot.logEnabled) {
-            logChannel.sendMessage("Starting").queue();
-        }
         System.out.println("Logged in as: " + jda.getSelfUser().getName());
         System.out.println("Amount of guilds: " + jda.getGuilds().size());
         System.out.print("Guilds:");
@@ -87,23 +80,9 @@ public class FoxoBot {
             System.out.print(" || " + g.getName() + "@" + g.getId());
         }
         System.out.println(" |@ Total: " + jda.getGuilds().size());
-        if (FoxoBot.logEnabled) {
-            logChannel.sendMessage("Initializing Timer Class").queue();
-        }
+
         Timer timer = new Timer();
         timer.schedule(new TimerTaskClass(), 0, 5000);
-        if (FoxoBot.logEnabled) {
-            logChannel.sendMessage("Initialized Timer Class").queue();
-        }
-
-        if (FoxoBot.logEnabled) {
-            logChannel.sendMessage("CWD: " + System.getProperty("user.dir")).queue();
-        }
-
-        if (FoxoBot.logEnabled) {
-            logChannel.sendMessage("Started").queue();
-        }
-
     }
 
 //    ObjectMapper mapper = new ObjectMapper();
