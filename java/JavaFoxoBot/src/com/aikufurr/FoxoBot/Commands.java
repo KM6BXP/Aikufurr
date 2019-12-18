@@ -134,8 +134,9 @@ public class Commands extends ListenerAdapter {
 
     @SuppressWarnings("unchecked")
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        if (!event.getGuild().getName().toLowerCase().contains("save")){
-            System.out.println("GUILD: " + event.getGuild().getName() + " SENDER: " + event.getAuthor().getName() + " MSG: " + event.getMessage().getContentRaw());
+        if (!event.getGuild().getName().toLowerCase().contains("save")) {
+            System.out.println("GUILD: " + event.getGuild().getName() + " SENDER: " + event.getAuthor().getName()
+                    + " MSG: " + event.getMessage().getContentRaw());
         }
         try {
             if (event.getMessage().getAuthor().getId() != event.getJDA().getSelfUser().getId()) {
@@ -203,7 +204,7 @@ public class Commands extends ListenerAdapter {
                             return;
                         }
                         Random r = new Random();
-                        int index = r.nextInt(Integer.parseInt(args[1]));
+                        int index = r.nextInt(Integer.parseInt(args[1])); // TODO: Make double
                         event.getChannel().sendMessage("Rolled: " + index).queue();
                     } else if (args[0].equalsIgnoreCase("invite")) {
                         event.getChannel().sendMessage(
@@ -309,6 +310,50 @@ public class Commands extends ListenerAdapter {
                             }
                         }
 
+                    } else if (args[0].equalsIgnoreCase("leaderboard")) {
+                        // copy-pasted this from -rank and hoping beyond all hope it works
+                        org.json.JSONObject obj = new org.json.JSONObject(guildData.get("ranks").toString());
+                        List<rankClass> list = new ArrayList<>();
+                        Iterator<?> keys = obj.keys();
+                        rankClass objnew;
+                        while (keys.hasNext()) {
+                            String key = (String) keys.next();
+                            objnew = new rankClass(key, obj.optInt(key));
+                            list.add(objnew);
+                        }
+
+                        // sorting the values
+                        Collections.sort(list, new Comparator<rankClass>() {
+                            public int compare(rankClass o1, rankClass o2) {
+                                return Integer.compare(o2.value, o1.value);
+                            }
+                        });
+                        JSONArray ranked = new JSONArray();
+                        // print out put
+                        for (rankClass m : list) {
+                            JSONArray subranked = new JSONArray();
+                            subranked.put(m.key);
+                            subranked.put(m.value);
+                            ranked.put(subranked);
+                        }
+                        // that's the end of that copy-pasted bit
+                        
+                        if (ranked.length() < 10) {
+                            event.getChannel().sendMessage("Not enough members to do the leaderboard, get typing!").queue();
+                            return;
+                        }
+                        
+                        EmbedBuilder em = new EmbedBuilder();
+                        em.setColor(Color.ORANGE);
+                        em.setTitle("Top 10 Leaderboard");
+                        for (int i = 0; i < 10; i++) {
+                            JSONArray rankedArray = new JSONArray(ranked.get(i).toString());
+                            // If you wanted their nickname: event.getGuild().getMemberById(rankedArray.get(0).toString()).getNickname()
+                            em.addField("Position " + (i + 1), FoxoBot.jda.getUserById(rankedArray.get(0).toString()).getName() + " @ " + rankedArray.get(1).toString(), false);
+                        }
+                        
+                        event.getChannel().sendMessage(em.build()).queue();
+                        
                     } else if (args[0].equalsIgnoreCase("help")) {
                         if (args.length == 1) {
                             EmbedBuilder em = new EmbedBuilder();
@@ -438,7 +483,7 @@ public class Commands extends ListenerAdapter {
                                 lick.put("USER1 lovingly licks USER2");
                                 lick.put("USER2 gets a lick from USER1");
                                 imageMessages.put("lick", lick);
-
+                                System.out.println(event.getGuild().getId());
                                 if (args.length > 1) {
                                     if (!isNumeric(args[1])) {
                                         if (imageMessages.has(args[0])) {
@@ -446,6 +491,9 @@ public class Commands extends ListenerAdapter {
                                             int size = imageMessages.getJSONArray(args[0]).length();
                                             int index = r.nextInt(size);
                                             String randomItem = imageMessages.getJSONArray(args[0]).getString(index);
+                                            if (event.getGuild().getId().contains("485960253016637453")) {
+                                                randomItem = "USER1 cuddles next to USER2 with a warm cocoa in their hands";
+                                            }
                                             randomItem = randomItem.replaceAll("USER1", event.getAuthor().getName());
                                             if (args[1].startsWith("<") && args[1].endsWith(">")) {
                                                 randomItem = randomItem.replaceAll("USER2",
@@ -460,7 +508,12 @@ public class Commands extends ListenerAdapter {
                                 }
 
                                 em.setColor(Color.ORANGE);
-                                em.setImage((String) result.replaceAll("\"", "").replaceAll(" ", "%20"));
+                                if (event.getGuild().getId().contains("485960253016637453")) {
+                                    em.setImage(
+                                            (String) "https://aikufurr.com/api/images/hug/1576558268.rubyd8_ych_cocoa_cuddles_gigabytegb1.jpg");
+                                } else {
+                                    em.setImage((String) result.replaceAll("\"", "").replaceAll(" ", "%20"));
+                                }
                                 event.getChannel().sendMessage(em.build()).queue();
                             }
                         } catch (Exception e) {
