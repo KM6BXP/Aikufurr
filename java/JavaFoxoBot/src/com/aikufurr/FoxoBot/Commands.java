@@ -179,6 +179,8 @@ public class Commands extends ListenerAdapter {
                     System.out.println(Arrays.toString(args));
                     if (args[0].equalsIgnoreCase("ping")) {
                         event.getChannel().sendMessage("Pong").queue();
+                    } else if (args[0].equalsIgnoreCase("pong")) {
+                        event.getChannel().sendMessage("Ping").queue();
                     } else if (args[0].equalsIgnoreCase("flip-a-coin") || args[0].equalsIgnoreCase("flipacoin")
                             || args[0].equalsIgnoreCase("flip") || args[0].equalsIgnoreCase("coin")) {
                         ArrayList<String> headTails = new ArrayList<String>();
