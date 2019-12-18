@@ -205,7 +205,7 @@ public class Commands extends ListenerAdapter {
                         }
                         Random r = new Random();
                         int index = r.nextInt(Integer.parseInt(args[1])); // TODO: Make double
-                        event.getChannel().sendMessage("Rolled: " + index).queue();
+                        event.getChannel().sendMessage("Rolled: " + (index + 1)).queue(); // added +1 because computers go from 0 to 19
                     } else if (args[0].equalsIgnoreCase("invite")) {
                         event.getChannel().sendMessage(
                                 "My Invite Link: https://discordapp.com/api/oauth2/authorize?client_id=618802156283363328&permissions=8&scope=bot");
@@ -337,12 +337,12 @@ public class Commands extends ListenerAdapter {
                             ranked.put(subranked);
                         }
                         // that's the end of that copy-pasted bit
-                        
+
                         if (ranked.length() < 10) {
                             event.getChannel().sendMessage("Not enough members to do the leaderboard, get typing!").queue();
                             return;
                         }
-                        
+
                         EmbedBuilder em = new EmbedBuilder();
                         em.setColor(Color.ORANGE);
                         em.setTitle("Top 10 Leaderboard");
@@ -356,9 +356,9 @@ public class Commands extends ListenerAdapter {
                             String score = rankedArray.get(1).toString();
                             em.addField("Position " + (i + 1), name + " @ " + score, false);
                         }
-                        
+
                         event.getChannel().sendMessage(em.build()).queue();
-                        
+
                     } else if (args[0].equalsIgnoreCase("help")) {
                         if (args.length == 1) {
                             EmbedBuilder em = new EmbedBuilder();
