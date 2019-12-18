@@ -349,7 +349,12 @@ public class Commands extends ListenerAdapter {
                         for (int i = 0; i < 10; i++) {
                             JSONArray rankedArray = new JSONArray(ranked.get(i).toString());
                             // If you wanted their nickname: event.getGuild().getMemberById(rankedArray.get(0).toString()).getNickname()
-                            em.addField("Position " + (i + 1), FoxoBot.jda.getUserById(rankedArray.get(0).toString()).getName() + " @ " + rankedArray.get(1).toString(), false);
+                            String userID = rankedArray.get(0).toString();
+                            System.out.println("UserID: "+ userID);
+                            String name = FoxoBot.jda.getUserById(userID).getName();
+                            System.out.println("name: " + name);
+                            String score = rankedArray.get(1).toString();
+                            em.addField("Position " + (i + 1), name + " @ " + score, false);
                         }
                         
                         event.getChannel().sendMessage(em.build()).queue();

@@ -69,6 +69,7 @@ public class FoxoBot {
         jda.getPresence().setActivity(Activity.watching("Foxes Playing"));
         jda.addEventListener(new Commands());
         jda.addEventListener(new GenericMessageReactionAdd());
+        jda.addEventListener(new GuildMemberLeave());
         jda.addEventListener(new GuildEvents());
         jda.awaitReady();
         System.out.println("Logged in as: " + jda.getSelfUser().getName());
